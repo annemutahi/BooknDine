@@ -55,7 +55,7 @@ ROOT_URLCONF = 'BooknDine.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -75,10 +75,10 @@ WSGI_APPLICATION = 'BooknDine.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'mysql.connector.django',
+        'ENGINE': 'django.db.backends.mysql',
         'NAME': 'bookndine',
-        'USER': 'root',
-        'PASSWORD': 'Nyambura1',
+        'USER': 'django_user',
+        'PASSWORD': 'BooknD!ne',
         'HOST': 'localhost',
         'PORT': '3306',
     }

@@ -16,22 +16,31 @@ class Staff(models.Model):
         return f"{self.name} - {self.role}"
     
 class Bookings(models.Model):
+    class Status(models.TextChoices):
+        PENDING = 'PENDING', 'Pending'
+        CONFIRMED = 'CONFIRMED', 'Confirmed'
+        CANCELLED = 'CANCELLED', 'Cancelled'
+
     guest = models.ForeignKey(Guests, on_delete=models.CASCADE)
     start_time = models.TimeField()
     end_time = models.TimeField()
-    status = models.enums.TextChoices('Status', 'PENDING CONFIRMED CANCELLED')
-    staff = models.ForeignKey('Staff', on_delete=models.SET_NULL, null=True, blank=True)
+    status = models.CharField(max_length=10, choices=Status.choices, default=Status.PENDING)
+    staff = models.ForeignKey(Staff, on_delete=models.SET_NULL, null=True, blank=True)
 
     def __str__(self):
-        return f"Booking for {self.guest.name} from {self.start_time} to {self.end_time}"
+        return f"Booking for {self.guest.name} ({self.status})"
     
 class Table(models.Model):
+    class Location(models.TextChoices):
+        INDOOR = 'INDOOR', 'Indoor'
+        OUTDOOR = 'OUTDOOR', 'Outdoor'
+
     table_number = models.IntegerField(unique=True)
     capacity = models.IntegerField()
-    location = models.enums.TextChoices('Location', 'INDOOR OUTDOOR')
+    location = models.CharField(max_length=10, choices=Location.choices, default=Location.INDOOR)
 
     def __str__(self):
-        return f"Table {self.table_number} (Capacity: {self.capacity})"
+        return f"Table {self.table_number} ({self.location}, Capacity: {self.capacity})"
     
 class Bookings_Table(models.Model):
     booking = models.ForeignKey(Bookings, on_delete=models.CASCADE)

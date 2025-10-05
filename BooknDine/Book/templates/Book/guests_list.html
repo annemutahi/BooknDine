@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Guests</h2>
+<a href="{% url 'bookndine:guest-add' %}">Add New Guest</a>
+<ul>
+  {% for guest in object_list %}
+    <li>
+      <a href="{% url 'bookndine:guest-detail' guest.pk %}">{{ guest.name }}</a>
+      ({{ guest.email }})
+    </li>
+  {% empty %}
+    <li>No guests found.</li>
+  {% endfor %}
+</ul>
+{% endblock %}
