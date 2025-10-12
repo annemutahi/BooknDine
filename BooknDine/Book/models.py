@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from staff.models import Staff
 
 class Guests(models.Model):
     name = models.CharField(max_length=100)
@@ -9,12 +10,6 @@ class Guests(models.Model):
     def __str__(self):
         return self.name
 
-class Staff(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    role = models.CharField(max_length=50, blank=True, null=True)
-
-    def __str__(self):
-        return self.user.username
     
 class Bookings(models.Model):
     class Status(models.TextChoices):
@@ -37,7 +32,7 @@ class Table(models.Model):
         OUTDOOR = 'OUTDOOR', 'Outdoor'
 
     table_number = models.IntegerField(unique=True)
-    capacity = models.IntegerField()
+    capacity = models.PositiveIntegerField()
     location = models.CharField(max_length=10, choices=Location.choices, default=Location.INDOOR)
 
     def __str__(self):
