@@ -2,14 +2,15 @@ from django.shortcuts import render, get_object_or_404
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
 from .models import Guests, Bookings
+from .mixins import StaffRequiredMixin
 
 # --- Guests Views ---
-class GuestListView(ListView):
+class GuestListView(StaffRequiredMixin, ListView):
     model = Guests
     template_name = 'guests_list.html'
 
 
-class GuestDetailView(DetailView):
+class GuestDetailView(StaffRequiredMixin, DetailView):
     model = Guests
     template_name = 'guest_detail.html'
 
@@ -21,26 +22,26 @@ class GuestCreateView(CreateView):
     success_url = reverse_lazy('guest-list')
 
 
-class GuestUpdateView(UpdateView):
+class GuestUpdateView(StaffRequiredMixin, UpdateView):
     model = Guests
     fields = ['name', 'email', 'phone_number']
     template_name = 'guest_form.html'
     success_url = reverse_lazy('guest-list')
 
 
-class GuestDeleteView(DeleteView):
+class GuestDeleteView(StaffRequiredMixin, DeleteView):
     model = Guests
     template_name = 'guest_confirm_delete.html'
     success_url = reverse_lazy('guest-list')
 
 
 # --- Bookings Views ---
-class BookingListView(ListView):
+class BookingListView(StaffRequiredMixin, ListView):
     model = Bookings
     template_name = 'bookings_list.html'
 
 
-class BookingDetailView(DetailView):
+class BookingDetailView(StaffRequiredMixin, DetailView):
     model = Bookings
     template_name = 'booking_detail.html'
 
