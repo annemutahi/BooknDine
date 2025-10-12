@@ -19,11 +19,8 @@ class StaffProfile(models.Model):
 #signal to create or update staff profile when user is created or updated
 @receiver(post_save, sender=User)
 def create_or_update_staff_profile(sender, instance, created, **kwargs):
-    if created and instance.is_staff:
-        StaffProfile.objects.create(user=instance)
-    instance.staffprofile.save()
-
-@receiver(post_save, sender=User)
-def save_user_profile(sender, instance, **kwargs):
+    # Only create/update for staff users
     if instance.is_staff:
-        instance.staffprofile.save()
+        StaffProfile.objects.get_or_create(user=instance)
+    else:
+        StaffProfile.objects.filter(user=instance).delete()

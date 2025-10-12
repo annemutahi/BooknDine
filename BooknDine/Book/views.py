@@ -1,8 +1,10 @@
 from django.views.generic import CreateView, ListView, DetailView
 from django.urls import reverse_lazy
-from .models import Guests, Bookings
+from .models import Guests, Bookings, Table
 from django.shortcuts import redirect
 from django.shortcuts import get_object_or_404, render
+from .serializers import BookingSerializer, GuestSerializer, TableSerializer
+from rest_framework import generics, permissions
 
 class GuestCreateView(CreateView):
     model = Guests
@@ -23,7 +25,7 @@ class GuestDetailView(DetailView):
     
 class BookingCreateView(CreateView):
     model = Bookings
-    fields = ['guest', 'start_time', 'end_time', 'status']  # No staff or status here!
+    fields = ['guest', 'table', 'start_time', 'end_time', 'num_people', 'status']  # No staff or status here!
     template_name = 'Book/booking_form.html'
     success_url = reverse_lazy('booking-list')
     def form_valid(self, form):
@@ -48,3 +50,29 @@ class BookingDetailView(DetailView):
 def booking_confirmation(request, booking_id):
     booking = get_object_or_404(Bookings, id=booking_id)
     return render(request, 'bookings/booking_confirmation.html', {'booking': booking})
+
+class GuestListCreateView(generics.ListCreateAPIView):
+    queryset = Guests.objects.all()
+    serializer_class = GuestSerializer
+
+class GuestDetailView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Guests.objects.all()
+    serializer_class = GuestSerializer
+
+class TableListView(generics.ListAPIView):
+    queryset = Table.objects.all()
+    serializer_class = TableSerializer
+
+
+class TableDetailView(generics.RetrieveAPIView):
+    queryset = Table.objects.all()
+    serializer_class = TableSerializer
+
+class BookingListCreateView(generics.ListCreateAPIView):
+    queryset = Bookings.objects.all()
+    serializer_class = BookingSerializer
+
+
+class BookingDetailView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Bookings.objects.all()
+    serializer_class = BookingSerializer

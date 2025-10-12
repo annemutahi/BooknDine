@@ -21,8 +21,8 @@ from django.views.generic import RedirectView
 
 
 urlpatterns = [
-    path('', RedirectView.as_view(pattern_name='guest-add', permanent=False)),
+    #path('', RedirectView.as_view(pattern_name='guest-add', permanent=False)),
     path('admin/', admin.site.urls),
-    path('guests/', include('Book.urls')),
-    path('staff/', include('staff.urls')),
+    path('', include('Book.urls')),
+    path('', include('staff.urls')),
 ]

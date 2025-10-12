@@ -5,6 +5,11 @@ from django.views.generic import ListView, TemplateView, UpdateView, View
 from django.urls import reverse_lazy
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
+from rest_framework import generics, permissions
+from .serializers import StaffProfileSerializer
+from .models import StaffProfile
+from rest_framework.response import Response
+from rest_framework.decorators import api_view, permission_classes
 
 
 def staff_login(request):
@@ -45,3 +50,31 @@ class BookingStatusUpdateView(StaffRequiredMixin, View):
         booking.save()
         messages.success(request, 'Booking status updated successfully!')
         return redirect('staff:dashboard')
+
+# API Views for StaffProfile 
+class StaffListCreateView(generics.ListCreateAPIView):
+    queryset = StaffProfile.objects.select_related('user')
+    serializer_class = StaffProfileSerializer
+    permission_classes = [permissions.IsAdminUser]
+
+class StaffDetailView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = StaffProfile.objects.select_related('user')
+    serializer_class = StaffProfileSerializer
+    permission_classes = [permissions.IsAdminUser]
+
+# Authentication APIs
+@api_view(['POST'])
+def staff_login(request):
+    username = request.data.get('username')
+    password = request.data.get('password')
+    user = authenticate(request, username=username, password=password)
+    if user is not None and user.is_staff:
+        login(request, user)
+        return Response({'message': 'Login successful'})
+    return Response({'error': 'Invalid credentials or not a staff user'}, status=400)
+
+@api_view(['POST'])
+@permission_classes([permissions.IsAuthenticated])
+def staff_logout(request):
+    logout(request)
+    return Response({'message': 'Logged out successfully'})

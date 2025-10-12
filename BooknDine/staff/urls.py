@@ -1,5 +1,6 @@
 from django.urls import path
 from .views import staff_login, staff_logout, DashboardView, BookingStatusUpdateView
+from . import views
 
 app_name = 'staff'
 
@@ -8,4 +9,10 @@ urlpatterns = [
     path('logout/', staff_logout, name='logout'),
     path('dashboard/', DashboardView.as_view(), name='dashboard'),
     path('update/<int:booking_id>/', BookingStatusUpdateView.as_view(), name='update_status'),
+
+    # API endpoints
+    path('api/staff/', views.StaffListCreateView.as_view(), name='staff-list-create'),
+    path('api/staff/<int:pk>/', views.StaffDetailView.as_view(), name='staff-detail'),
+    path('api/auth/login/', views.staff_login, name='staff-login'),
+    path('api/auth/logout/', views.staff_logout, name='staff-logout'),
 ]
