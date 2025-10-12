@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block title %}Book a Table{% endblock %}
+
+{% block content %}
+<div class="container mt-5" style="max-width: 600px;">
+  <div class="card shadow-sm border-0 rounded-4">
+    <div class="card-body p-4">
+      <h3 class="card-title text-center mb-4">Book a Table</h3>
+
+      {% if messages %}
+        {% for message in messages %}
+          <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+        {% endfor %}
+      {% endif %}
+
+      <form method="post" novalidate>
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+
+        <!-- Table selection -->
+        <div class="mb-3">
+          {{ form.table.label_tag }}
+          {{ form.table }}
+          {{ form.table.errors }}
+        </div>
+
+        <!-- Start time -->
+        <div class="mb-3">
+          {{ form.start_time.label_tag }}
+          {{ form.start_time }}
+          {{ form.start_time.errors }}
+        </div>
+
+        <!-- End time -->
+        <div class="mb-3">
+          {{ form.end_time.label_tag }}
+          {{ form.end_time }}
+          {{ form.end_time.errors }}
+        </div>
+
+        <!-- Number of people -->
+        <div class="mb-3">
+          {{ form.num_people.label_tag }}
+          {{ form.num_people }}
+          {{ form.num_people.errors }}
+        </div>
+
+        <button type="submit" class="btn btn-primary w-100 py-2">Confirm Booking</button>
+      </form>
+
+      <div class="text-center mt-3">
+        <small class="text-muted">We’ll send you a confirmation email once your booking is received.</small>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

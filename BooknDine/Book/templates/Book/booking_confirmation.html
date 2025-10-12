@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5 text-center">
+  <h2>Booking Confirmed!</h2>
+  <p>Thank you, {{ booking.guest.name }}. Your reservation has been confirmed.</p>
+
+  <div class="card p-3 mt-3">
+    <p><strong>Table:</strong> {{ booking.table_position }}</p>
+    <p><strong>Number of Guests:</strong> {{ booking.number_of_people }}</p>
+    <p><strong>Date:</strong> {{ booking.date }}</p>
+    <p><strong>Status:</strong> {{ booking.status }}</p>
+  </div>
+
+  <a href="{% url 'guest-add' %}" class="btn btn-primary mt-3">Make Another Booking</a>
+</div>
+{% endblock %}
