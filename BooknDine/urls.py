@@ -24,5 +24,5 @@ urlpatterns = [
     #path('', RedirectView.as_view(pattern_name='guest-add', permanent=False)),
     path('admin/', admin.site.urls),
     path('', include('Book.urls')),
-    path('', include('staff.urls')),
+    path('staff/', include('staff.urls')),
 ]
