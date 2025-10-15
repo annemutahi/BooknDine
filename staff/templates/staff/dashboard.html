@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Staff Dashboard | BooknDine{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h3 class="mb-4 fw-bold">Staff Dashboard</h3>
+
+    {% if messages %}
+    <div>
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    {% if bookings %}
+    <div class="card p-3 shadow-sm border-0 rounded-3">
+        <div class="table-responsive">
+            <table class="table table-striped align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>ID</th>
+                        <th>Guest</th>
+                        <th>Table</th>
+                        <th>No. of People</th>
+                        <th>Start Time</th>
+                        <th>End Time</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for booking in bookings %}
+                    <tr>
+                        <td>{{ booking.id }}</td>
+                        <td>{{ booking.guest }}</td>
+                        <td>{{ booking.table }}</td>
+                        <td>{{ booking.num_people }}</td>
+                        <td>{{ booking.start_time|date:"Y-m-d H:i" }}</td>
+                        <td>{{ booking.end_time|date:"Y-m-d H:i" }}</td>
+                        <td>
+                            {% if booking.status == "Pending" %}
+                                <span class="badge bg-warning text-dark">{{ booking.status }}</span>
+                            {% elif booking.status == "Approved" %}
+                                <span class="badge bg-success">{{ booking.status }}</span>
+                            {% elif booking.status == "Cancelled" %}
+                                <span class="badge bg-danger">{{ booking.status }}</span>
+                            {% else %}
+                                <span class="badge bg-secondary">{{ booking.status }}</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="{% url 'staff:update_status' booking.id %}" class="btn btn-sm btn-primary">
+                                Update
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% else %}
+    <div class="alert alert-info mt-3">No bookings found.</div>
+    {% endif %}
+</div>
+{% endblock %}

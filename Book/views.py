@@ -5,6 +5,7 @@ from django.shortcuts import redirect
 from django.shortcuts import get_object_or_404, render
 from .serializers import BookingSerializer, GuestSerializer, TableSerializer
 from rest_framework import generics, permissions
+from django.urls import reverse
 
 class GuestCreateView(CreateView):
     model = Guests
@@ -25,15 +26,15 @@ class GuestDetailView(DetailView):
     
 class BookingCreateView(CreateView):
     model = Bookings
-    fields = ['guest', 'table', 'start_time', 'end_time', 'num_people', 'status']  # No staff or status here!
+    fields = ['guest', 'table', 'start_time', 'end_time', 'num_people', 'status']
     template_name = 'Book/booking_form.html'
-    success_url = reverse_lazy('booking-list')
+   
     def form_valid(self, form):
         guest_id = self.request.session.get('guest_id')
         if guest_id:
             form.instance.guest_id = guest_id
-        booking = form.save()
-        return redirect('booking-confirmation', booking_id=booking.id)
+        self.object = form.save()
+        return redirect(reverse('confirmation', kwargs={'booking_id': self.object.id}))
     
 class BookingListView(ListView):
     model = Bookings

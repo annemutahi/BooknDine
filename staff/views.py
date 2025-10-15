@@ -10,6 +10,8 @@ from .serializers import StaffProfileSerializer
 from .models import StaffProfile
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
+from django.views.decorators.http import require_http_methods
+from django.contrib.auth.decorators import login_required
 
 
 def staff_login(request):
@@ -23,6 +25,11 @@ def staff_login(request):
         else:
             messages.error(request, 'Invalid credentials or not authorised.')
     return render(request, 'staff/login.html')
+
+# @login_required
+# def dashboard(request):
+#     bookings = Bookings.objects.all().select_related('guest', 'table')
+#     return render(request, 'staff/dashboard.html', {'bookings': bookings})
 
 def staff_logout(request):
     logout(request)
@@ -49,7 +56,7 @@ class BookingStatusUpdateView(StaffRequiredMixin, View):
         booking.status = new_status
         booking.save()
         messages.success(request, 'Booking status updated successfully!')
-        return redirect('staff:dashboard')
+        return redirect('/staff/dashboard/')
 
 # API Views for StaffProfile 
 class StaffListCreateView(generics.ListCreateAPIView):
@@ -64,7 +71,7 @@ class StaffDetailView(generics.RetrieveUpdateDestroyAPIView):
 
 # Authentication APIs
 @api_view(['POST'])
-def staff_login(request):
+def staff_api_login(request):
     username = request.data.get('username')
     password = request.data.get('password')
     user = authenticate(request, username=username, password=password)
@@ -75,6 +82,6 @@ def staff_login(request):
 
 @api_view(['POST'])
 @permission_classes([permissions.IsAuthenticated])
-def staff_logout(request):
+def staff_api_logout(request):
     logout(request)
     return Response({'message': 'Logged out successfully'})

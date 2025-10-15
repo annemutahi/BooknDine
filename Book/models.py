@@ -34,6 +34,7 @@ class Bookings(models.Model):
     end_time = models.TimeField()
     status = models.CharField(max_length=10, choices=Status.choices, default=Status.PENDING)
     staff = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True) 
 
     def __str__(self):
         return f"Booking for {self.guest.name} ({self.status})"

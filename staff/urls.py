@@ -13,6 +13,6 @@ urlpatterns = [
     # API endpoints
     path('api/staff/', views.StaffListCreateView.as_view(), name='staff-list-create'),
     path('api/staff/<int:pk>/', views.StaffDetailView.as_view(), name='staff-detail'),
-    path('api/auth/login/', views.staff_login, name='staff-login'),
-    path('api/auth/logout/', views.staff_logout, name='staff-logout'),
+    path('api/auth/login/', views.staff_api_login, name='staff-login'),
+    path('api/auth/logout/', views.staff_api_logout, name='staff-logout'),
 ]
