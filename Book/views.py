@@ -6,6 +6,7 @@ from django.shortcuts import get_object_or_404, render
 from .serializers import BookingSerializer, GuestSerializer, TableSerializer
 from rest_framework import generics, permissions
 from django.urls import reverse
+from django.contrib import messages
 
 class GuestCreateView(CreateView):
     model = Guests
@@ -26,15 +27,19 @@ class GuestDetailView(DetailView):
     
 class BookingCreateView(CreateView):
     model = Bookings
-    fields = ['guest', 'table', 'start_time', 'end_time', 'num_people', 'status']
+    fields = ['table', 'start_time', 'end_time', 'num_people']
     template_name = 'Book/booking_form.html'
-   
+
     def form_valid(self, form):
         guest_id = self.request.session.get('guest_id')
-        if guest_id:
-            form.instance.guest_id = guest_id
+        if not guest_id:
+            messages.error(self.request, "Guest session not found. Please log in first.")
+            return redirect('guest-login')
+        form.instance.guest_id = guest_id
+        form.instance.status = Bookings.Status.PENDING
         self.object = form.save()
-        return redirect(reverse('confirmation', kwargs={'booking_id': self.object.id}))
+        messages.success(self.request, f"Booking created successfully for table {self.object.table}.")
+        return redirect(reverse('booking_confirmation', kwargs={'booking_id': self.object.id}))
     
 class BookingListView(ListView):
     model = Bookings
@@ -50,7 +55,7 @@ class BookingDetailView(DetailView):
 
 def booking_confirmation(request, booking_id):
     booking = get_object_or_404(Bookings, id=booking_id)
-    return render(request, 'bookings/booking_confirmation.html', {'booking': booking})
+    return render(request, 'Book/booking_confirmation.html', {'booking': booking})
 
 class GuestListCreateView(generics.ListCreateAPIView):
     queryset = Guests.objects.all()
