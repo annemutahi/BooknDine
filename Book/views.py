@@ -7,6 +7,9 @@ from .serializers import BookingSerializer, GuestSerializer, TableSerializer
 from rest_framework import generics, permissions
 from django.urls import reverse
 from django.contrib import messages
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
+from django.core.exceptions import ValidationError
 
 class GuestCreateView(CreateView):
     model = Guests
@@ -33,10 +36,31 @@ class BookingCreateView(CreateView):
     def form_valid(self, form):
         guest_id = self.request.session.get('guest_id')
         if not guest_id:
-            messages.error(self.request, "Guest session not found. Please log in first.")
-            return redirect('guest-login')
-        form.instance.guest_id = guest_id
+            messages.error(self.request, "Guest session not found. Please add guest details first.")
+            return redirect('guest-form')
+        guest = get_object_or_404(Guests, id=guest_id)
+        form.instance.guest = guest
         form.instance.status = Bookings.Status.PENDING
+
+        overlapping = Bookings.objects.filter(
+            table=form.cleaned_data['table'],
+            start_time__lt=form.cleaned_data['end_time'],
+            end_time__gt=form.cleaned_data['start_time']
+        )
+        if overlapping.exists():
+            form.add_error(None, ValidationError("This table is already booked for the selected time."))
+            return self.form_invalid(form)
+
+        same_guest = Bookings.objects.filter(
+            guest=guest,
+            table=form.cleaned_data['table'],
+            start_time__lt=form.cleaned_data['end_time'],
+            end_time__gt=form.cleaned_data['start_time']
+        )
+        if same_guest.exists():
+            form.add_error(None, ValidationError("You already have a booking for this table at this time."))
+            return self.form_invalid(form)
+        
         self.object = form.save()
         messages.success(self.request, f"Booking created successfully for table {self.object.table}.")
         return redirect(reverse('booking_confirmation', kwargs={'booking_id': self.object.id}))
@@ -57,28 +81,32 @@ def booking_confirmation(request, booking_id):
     booking = get_object_or_404(Bookings, id=booking_id)
     return render(request, 'Book/booking_confirmation.html', {'booking': booking})
 
+@method_decorator(csrf_exempt, name='dispatch')
 class GuestListCreateView(generics.ListCreateAPIView):
     queryset = Guests.objects.all()
     serializer_class = GuestSerializer
 
+@method_decorator(csrf_exempt, name='dispatch')
 class GuestDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Guests.objects.all()
     serializer_class = GuestSerializer
 
+@method_decorator(csrf_exempt, name='dispatch')
 class TableListView(generics.ListAPIView):
     queryset = Table.objects.all()
     serializer_class = TableSerializer
 
-
+@method_decorator(csrf_exempt, name='dispatch')
 class TableDetailView(generics.RetrieveAPIView):
     queryset = Table.objects.all()
     serializer_class = TableSerializer
 
+@method_decorator(csrf_exempt, name='dispatch')
 class BookingListCreateView(generics.ListCreateAPIView):
     queryset = Bookings.objects.all()
     serializer_class = BookingSerializer
 
-
+@method_decorator(csrf_exempt, name='dispatch')
 class BookingDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Bookings.objects.all()
     serializer_class = BookingSerializer

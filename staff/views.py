@@ -10,8 +10,8 @@ from .serializers import StaffProfileSerializer
 from .models import StaffProfile
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
-from django.views.decorators.http import require_http_methods
-from django.contrib.auth.decorators import login_required
+from django.views.decorators.csrf import csrf_exempt
+from Book.serializers import BookingSerializer
 
 
 def staff_login(request):
@@ -85,3 +85,25 @@ def staff_api_login(request):
 def staff_api_logout(request):
     logout(request)
     return Response({'message': 'Logged out successfully'})
+
+class BookingDetailAPIView(generics.RetrieveAPIView):
+    queryset = Bookings.objects.all()
+    serializer_class = BookingSerializer
+    permission_classes = [permissions.IsAdminUser]
+
+@csrf_exempt
+@api_view(['PATCH'])
+@permission_classes([permissions.IsAdminUser])
+def update_booking_status(request, booking_id):
+    try:
+        booking = Bookings.objects.get(pk=booking_id)
+    except Bookings.DoesNotExist:
+        return Response({'error': 'Booking not found'}, status=404)
+
+    new_status = request.data.get('status')
+    if not new_status:
+        return Response({'error': 'Status field is required'}, status=400)
+
+    booking.status = new_status
+    booking.save()
+    return Response({'message': 'Booking status updated successfully', 'booking_id': booking.id, 'status': booking.status})

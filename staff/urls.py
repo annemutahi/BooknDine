@@ -15,4 +15,6 @@ urlpatterns = [
     path('api/staff/<int:pk>/', views.StaffDetailView.as_view(), name='staff-detail'),
     path('api/auth/login/', views.staff_api_login, name='staff-login'),
     path('api/auth/logout/', views.staff_api_logout, name='staff-logout'),
+    path('api/bookings/<int:pk>/', views.BookingDetailAPIView.as_view(), name='booking_detail_api'),
+    path('api/bookings/<int:booking_id>/update-status/', views.update_booking_status, name='booking_status_update_api'),
 ]
