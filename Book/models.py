@@ -1,5 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
+from django.utils import timezone
 
 class Guests(models.Model):
     name = models.CharField(max_length=100)
@@ -36,16 +38,32 @@ class Bookings(models.Model):
     staff = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True) 
 
+    def clean(self):
+        # Check overlapping bookings for the same table
+        overlapping = Bookings.objects.filter(
+            table=self.table,
+            start_time__lt=self.end_time,
+            end_time__gt=self.start_time
+        ).exclude(id=self.id)
+
+        if overlapping.exists():
+            raise ValidationError("This table is already booked for the selected time.")
+
+        # Optional: prevent the same guest from double-booking
+        same_guest = Bookings.objects.filter(
+            guest=self.guest,
+            table=self.table,
+            start_time__lt=self.end_time,
+            end_time__gt=self.start_time
+        ).exclude(id=self.id)
+
+        if same_guest.exists():
+            raise ValidationError("You already have a booking for this table at this time.")
+
+    def save(self, *args, **kwargs):
+        self.clean()  # run validation before saving
+        super().save(*args, **kwargs)
+
     def __str__(self):
         return f"Booking for {self.guest.name} ({self.status})"
     
-# class Bookings_Table(models.Model):
-#     booking = models.ForeignKey(Bookings, on_delete=models.CASCADE)
-#     table = models.ForeignKey(Table, on_delete=models.CASCADE)
-
-#     class Meta:
-#         unique_together = ('booking', 'table')
-
-#     def __str__(self):
-#         return f"Booking {self.booking.id} - Table {self.table.table_number}"    
-# pressure test this later----
