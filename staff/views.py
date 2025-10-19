@@ -9,10 +9,10 @@ from rest_framework import generics, permissions
 from .serializers import StaffProfileSerializer
 from .models import StaffProfile
 from rest_framework.response import Response
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework.decorators import api_view, permission_classes, authentication_classes
 from django.views.decorators.csrf import csrf_exempt
 from Book.serializers import BookingSerializer
-
+from django.middleware import csrf
 
 def staff_login(request):
     if request.method == 'POST':
@@ -25,11 +25,6 @@ def staff_login(request):
         else:
             messages.error(request, 'Invalid credentials or not authorised.')
     return render(request, 'staff/login.html')
-
-# @login_required
-# def dashboard(request):
-#     bookings = Bookings.objects.all().select_related('guest', 'table')
-#     return render(request, 'staff/dashboard.html', {'bookings': bookings})
 
 def staff_logout(request):
     logout(request)
@@ -69,27 +64,44 @@ class StaffDetailView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = StaffProfileSerializer
     permission_classes = [permissions.IsAdminUser]
 
-# Authentication APIs
-@api_view(['POST'])
-def staff_api_login(request):
-    username = request.data.get('username')
-    password = request.data.get('password')
-    user = authenticate(request, username=username, password=password)
-    if user is not None and user.is_staff:
-        login(request, user)
-        return Response({'message': 'Login successful'})
-    return Response({'error': 'Invalid credentials or not a staff user'}, status=400)
-
-@api_view(['POST'])
-@permission_classes([permissions.IsAuthenticated])
-def staff_api_logout(request):
-    logout(request)
-    return Response({'message': 'Logged out successfully'})
+class BookingListView(generics.ListAPIView):
+    queryset = Bookings.objects.all()
+    serializer_class = BookingSerializer
+    permission_classes = [permissions.IsAdminUser]
 
 class BookingDetailAPIView(generics.RetrieveAPIView):
     queryset = Bookings.objects.all()
     serializer_class = BookingSerializer
     permission_classes = [permissions.IsAdminUser]
+
+# Authentication APIs
+@csrf_exempt
+@api_view(['POST'])
+@authentication_classes([])  # disable SessionAuthentication
+@permission_classes([])      # make open for now
+def staff_api_login(request):
+    data = request.data if request.data else request.POST
+    username = data.get('username')
+    password = data.get('password')
+
+    if not username or not password:
+        return Response({'error': 'Username and password are required.'}, status=400)
+
+    user = authenticate(username=username, password=password)
+    if user is not None and user.is_staff:
+        login(request, user)
+        response = Response({'message': 'Login successful'})
+        response.set_cookie(key='sessionid', value=request.session.session_key, httponly=True)
+        return response
+    
+    return Response({'error': 'Invalid credentials or not a staff user'}, status=400)
+
+@csrf_exempt
+@api_view(['POST'])
+@permission_classes([permissions.IsAuthenticated])
+def staff_api_logout(request):
+    logout(request)
+    return Response({'message': 'Logged out successfully'})
 
 @csrf_exempt
 @api_view(['PATCH'])

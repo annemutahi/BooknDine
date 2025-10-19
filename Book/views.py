@@ -105,8 +105,10 @@ class TableDetailView(generics.RetrieveAPIView):
 class BookingListCreateView(generics.ListCreateAPIView):
     queryset = Bookings.objects.all()
     serializer_class = BookingSerializer
+    permission_classes = [permissions.IsAuthenticated]
 
 @method_decorator(csrf_exempt, name='dispatch')
 class BookingDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Bookings.objects.all()
     serializer_class = BookingSerializer
+    permission_classes = [permissions.IsAuthenticated]
