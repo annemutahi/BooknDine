@@ -105,39 +105,16 @@ Handles staff authentication, dashboard management, and booking updates.
 | `/staff/api/auth/logout/` | **POST** | Logout via API |
 
 ---
+Project Strucure
 
 BooknDine/
-│
-├── Book/                      # Guest booking app
-│   ├── migrations/
-│   ├── templates/Book/
-│   │   ├── booking_form.html
-│   │   ├── booking_confirmation.html
-│   │   └── guest_list.html
-│   ├── models.py
-│   ├── views.py
-│   ├── serializers.py
-│   ├── urls.py
-│   └── admin.py
-│
-├── Staff/                     # Staff management app
-│   ├── migrations/
-│   ├── templates/Staff/
-│   │   ├── dashboard.html
-│   │   ├── login.html
-│   │   └── update_status.html
-│   ├── models.py
-│   ├── views.py
-│   ├── serializers.py
-│   ├── urls.py
-│   └── admin.py
-│
-├── BooknDine/                 # Project settings
-│   ├── settings.py
-│   ├── urls.py
-│   └── wsgi.py
-│
+├── BooknDine/
+├── book/
+├── staff/
+├──.env 
+├──.gitignore
 ├── manage.py
+└── README.md
 
 
 🚀 Future Enhancements
