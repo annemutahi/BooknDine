@@ -1,65 +1,156 @@
-🍽️ BooknDine — Restaurant Booking System
+# 🍽️ BooknDine — Restaurant Booking & Management System
 
-BooknDine is a Django-based restaurant booking system that allows guests to make reservations online and enables staff to manage them efficiently.
-Guests can submit their booking details including name, table position, and number of people.
-Staff members can view all reservations, update their status, or cancel them through an intuitive admin or management interface.
+**BooknDine** is a Django-based restaurant booking and staff management system with two integrated apps:  
+- **Book** – for guest bookings and table management.  
+- **Staff** – for staff authentication, reservation control, and API access.
 
-⚙️ Core Features
-✅ Guest Booking — Guests can make table reservations by filling in their details.
-✅ Table Management — Each reservation is linked to a specific table position.
-✅ Capacity Tracking — Number of people per reservation is stored for planning.
-✅ Staff Controls — Staff can approve, update, or cancel reservations.
-✅ CRUD Operations — Create, view, edit, and delete reservations.
+The platform provides both a **web interface** and **REST API endpoints** to support frontend clients or third-party integrations.
 
-🧠 Tech Stack
-Component	Technology
-Framework	Django 5.2.5
-Language	Python 3.13
-Frontend	HTML, CSS, Bootstrap
-Database	MySQL
-Server	Django Development Server
+---
 
-Access the app
-🌐 Guest interface → http://127.0.0.1:8000/guests/
-🔐 Admin interface → http://127.0.0.1:8000/admin/
+## ⚙️ Core Features
 
-🧩 URL Patterns
-URL	View	Purpose
-/guests/	GuestListView	List all reservations
-/guests/add/	GuestCreateView	Make a new reservation
-/guests/<int:pk>/	GuestDetailView	View reservation details
-/guests/<int:pk>/edit/	GuestUpdateView	Edit reservation status/details
-/guests/<int:pk>/delete/	GuestDeleteView	Cancel or remove a reservation
-🧱 Project Structure
+✅ **Guest Reservations** — Guests can make bookings online.  
+✅ **Table Management** — Reservations are tied to specific tables and positions.  
+✅ **Staff Dashboard** — Staff can view, confirm, or cancel bookings.  
+✅ **Role-Based Access** — Separate permissions for staff, admin, and guests.  
+✅ **RESTful API** — All major features are accessible via REST endpoints.  
+✅ **CRUD Operations** — Full create, read, update, and delete functionality.
+
+---
+
+## 🧠 Tech Stack
+
+| Component | Technology |
+|------------|-------------|
+| **Framework** | Django 5.2.5 |
+| **API Framework** | Django REST Framework (DRF) |
+| **Language** | Python 3.13 |
+| **Frontend** | HTML, CSS, Bootstrap |
+| **Database** | MySQL |
+| **Server** | Django Development Server |
+| **Authentication** | Django built-in & token-based (API) |
+
+---
+
+## 🗂️ App Overview
+
+### 🧾 **Book App**
+Handles guest reservations, table management, and confirmation views.
+
+**Key Models:** `Guests`, `Table`, `Bookings`  
+**Primary Views:** Guest registration, booking creation, and confirmation.
+
+---
+
+### 👨‍🍳 **Staff App**
+Handles staff authentication, dashboard management, and booking updates.
+
+**Key Models:** `StaffProfile`  
+**Primary Views:** Staff login, dashboard, and status updates.
+
+---
+
+## 🌐 Web Interfaces
+
+| Interface | URL | Description |
+|------------|------|-------------|
+| **Guest Portal** | [`/book/`](http://127.0.0.1:8000/book/) | For guests to make and view bookings |
+| **Staff Portal** | [`/staff/dashboard/`](http://127.0.0.1:8000/staff/dashboard/) | Staff dashboard and management view |
+| **Admin Panel** | [`/admin/`](http://127.0.0.1:8000/admin/) | Django admin site for superusers |
+
+---
+
+## 🔗 URL ROUTES
+
+### 📘 **Book App**
+
+#### Web Routes
+| URL | View | Description |
+|------|------|-------------|
+| `/book/guest/add/` | `GuestCreateView` | Add a new guest |
+| `/book/guest/<int:pk>/` | `GuestDetailView` | View guest details |
+| `/book/bookings/add/` | `BookingCreateView` | Create a new booking |
+| `/book/bookings/<int:pk>/` | `BookingDetailView` | View booking details |
+| `/book/bookings/confirmation/<int:booking_id>/` | `booking_confirmation` | Booking confirmation page |
+
+#### API Endpoints
+| Endpoint | Method | Description |
+|-----------|---------|-------------|
+| `/book/api/guests/` | **GET / POST** | List or create guests |
+| `/book/api/guests/<int:pk>/` | **GET / PUT / DELETE** | Retrieve, update, or delete a guest |
+| `/book/api/tables/` | **GET** | List all tables |
+| `/book/api/tables/<int:pk>/` | **GET** | Retrieve a table |
+| `/book/api/bookings/` | **GET / POST** | List or create bookings |
+| `/book/api/bookings/<int:pk>/` | **GET / PUT / DELETE** | Retrieve, update, or delete a booking |
+
+---
+
+### 👨‍💼 **Staff App**
+
+#### Web Routes
+| URL | View | Description |
+|------|------|-------------|
+| `/staff/login/` | `staff_login` | Staff login |
+| `/staff/logout/` | `staff_logout` | Staff logout |
+| `/staff/dashboard/` | `DashboardView` | Staff dashboard showing all bookings |
+| `/staff/update/<int:booking_id>/` | `BookingStatusUpdateView` | Update booking status |
+
+#### API Endpoints
+| Endpoint | Method | Description |
+|-----------|---------|-------------|
+| `/staff/api/staff/` | **GET / POST** | List or create staff profiles |
+| `/staff/api/staff/<int:pk>/` | **GET / PUT / DELETE** | Retrieve or modify a staff profile |
+| `/staff/api/auth/login/` | **POST** | Login via API |
+| `/staff/api/auth/logout/` | **POST** | Logout via API |
+
+---
+
 BooknDine/
 │
-├── Book/                      # Main app
+├── Book/                      # Guest booking app
 │   ├── migrations/
-│   ├── templates/
-│   │   ├── base.html
-│   │   ├── guest_list.html
-│   │   ├── guest_detail.html
-│   │   ├── guest_form.html
-│   │   └── guest_confirm_delete.html
-│   ├── models.py              # Reservation & guest models
-│   ├── views.py               # Class-based views
-│   ├── urls.py                # App-level routes
-│   └── admin.py               # Staff admin management
+│   ├── templates/Book/
+│   │   ├── booking_form.html
+│   │   ├── booking_confirmation.html
+│   │   └── guest_list.html
+│   ├── models.py
+│   ├── views.py
+│   ├── serializers.py
+│   ├── urls.py
+│   └── admin.py
 │
-├── BooknDine/                 # Project configuration
+├── Staff/                     # Staff management app
+│   ├── migrations/
+│   ├── templates/Staff/
+│   │   ├── dashboard.html
+│   │   ├── login.html
+│   │   └── update_status.html
+│   ├── models.py
+│   ├── views.py
+│   ├── serializers.py
+│   ├── urls.py
+│   └── admin.py
+│
+├── BooknDine/                 # Project settings
 │   ├── settings.py
 │   ├── urls.py
 │   └── wsgi.py
 │
 ├── manage.py
 
-🧰 Future Enhancements
 
-📧 Add email or SMS booking confirmations
+🚀 Future Enhancements
 
-📊 Integrate analytics dashboard for restaurant occupancy
+📧 Email and SMS booking confirmations
 
-💳 Enable payment or deposit options for reservations
+📊 Analytics dashboard for reservations and occupancy
+
+💳 Payment and deposit integration
+
+🔐 JWT authentication for API access
+
+📱 Mobile client app integration
 
 
 👩‍💻 Author
