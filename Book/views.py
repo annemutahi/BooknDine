@@ -10,11 +10,13 @@ from django.contrib import messages
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from django.core.exceptions import ValidationError
+from rest_framework.permissions import AllowAny
 
 class GuestCreateView(CreateView):
     model = Guests
     fields = ['name', 'email', 'phone_number']
     template_name = 'Book/guest_form.html'
+    
     def form_valid(self, form):
         # Save the guest
         guest = form.save()
@@ -23,12 +25,14 @@ class GuestCreateView(CreateView):
         # Redirect to booking form
         return redirect('booking-add')
     
+    
 class GuestDetailView(DetailView):
     model = Guests
     template_name = 'Book/guest_detail.html'
     context_object_name = 'guest'
     
 class BookingCreateView(CreateView):
+    permission_classes = [AllowAny]
     model = Bookings
     fields = ['table', 'start_time', 'end_time', 'num_people']
     template_name = 'Book/booking_form.html'
@@ -85,6 +89,7 @@ def booking_confirmation(request, booking_id):
 class GuestListCreateView(generics.ListCreateAPIView):
     queryset = Guests.objects.all()
     serializer_class = GuestSerializer
+    permission_classes = [AllowAny]
 
 @method_decorator(csrf_exempt, name='dispatch')
 class GuestDetailView(generics.RetrieveUpdateDestroyAPIView):
@@ -105,7 +110,7 @@ class TableDetailView(generics.RetrieveAPIView):
 class BookingListCreateView(generics.ListCreateAPIView):
     queryset = Bookings.objects.all()
     serializer_class = BookingSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [AllowAny]
 
 @method_decorator(csrf_exempt, name='dispatch')
 class BookingDetailView(generics.RetrieveUpdateDestroyAPIView):

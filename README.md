@@ -132,7 +132,6 @@ add booking
     "num_people": 4,
     "start_time": "19:00:00",
     "end_time": "21:00:00",
-    "status": "PENDING"
 }
 
 POST- http://127.0.0.1:8000/staff/api/token/
