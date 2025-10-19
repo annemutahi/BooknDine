@@ -115,6 +115,43 @@ BooknDine/
 ├── manage.py
 └── README.md
 
+API tests
+POST- http://127.0.0.1:8000/book/api/guests/
+{
+    "name": "name",
+    "email": "name@gmail.com",
+    "phone_number": "00000010"
+
+}
+
+POST- http://127.0.0.1:8000/book/api/bookings/
+add booking
+{
+    "guest": given guest id,
+    "table": 2,
+    "num_people": 4,
+    "start_time": "19:00:00",
+    "end_time": "21:00:00",
+    "status": "PENDING"
+}
+
+POST- http://127.0.0.1:8000/staff/api/token/
+login
+{
+   "username": "name",
+   "password": "password"
+}
+
+GET- http://127.0.0.1:8000/staff/api/bookings/- view bookings
+
+PATCH- http://127.0.0.1:8000/staff/api/bookings/booking-id/update-status/
+update status
+{
+  "status": "confirmed/cancelled/pending"
+}
+
+
+
 
 🚀 Future Enhancements
 
