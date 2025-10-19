@@ -111,7 +111,6 @@ BooknDine/
 ├── BooknDine/
 ├── book/
 ├── staff/
-├──.env 
 ├──.gitignore
 ├── manage.py
 └── README.md
